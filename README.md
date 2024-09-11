@@ -31,7 +31,7 @@ Import numpy as np
 %matplotlib inline
 ```
 
-For importing Pandas, Mathplotlib and Numpy respectively.
+For importing __Pandas__, __Mathplotlib__ and __Numpy__ respectively.
 
 __Pandas__ is used for databases to access, modify and delete them.
 
