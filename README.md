@@ -1,8 +1,8 @@
 ## Installing JUPYTER (OPTIONAL)
 
-First I would recommend to install JUPYTER because it looks more appealing than VS for python.
+First I would recommend to install JUPYTER because it looks more appealing than __VSCode__ for __Python__.
 
-You can either install it with your python console using the command:
+You can either install it with your __Python__ console using the command:
 
 ```python
 jupyter notebook
@@ -20,18 +20,18 @@ docker run -p 8888:8888 -v /path/on/host:/path/in/container jupyter/base-noteboo
 !pip install pandas matplotlib numpy
 ```
 
-For installing the dictionaries and make it be avalaible for import
+For installing the dictionaries and make it be available for import
 
 ```python
 Import pandas as pd
 Import mathplotlib.pyplot as plt
-Import numpy as mp
+Import numpy as np
 ```
 
 For importing Pandas, Mathplotlib and Numpy respectively.
 
-*Pandas* is used for databases to access, modify and delete them.
+__Pandas__ is used for databases to access, modify and delete them.
 
-*Numpy* is used for variables for databases.
+__Numpy__ is used for variables for databases.
 
-*Mathplotlib* is used for graphic representation for the database.
+__Mathplotlib__ is used for graphic representation for the database.
