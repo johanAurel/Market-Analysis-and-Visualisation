@@ -26,7 +26,7 @@ For installing the library and make it be available for import
 Import pandas as pd
 Import mathplotlib.pyplot as plt
 Import numpy as np
-%matplot inline
+%matplotlib inline
 ```
 
 For importing Pandas, Mathplotlib and Numpy respectively.
