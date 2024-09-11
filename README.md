@@ -16,7 +16,7 @@ Or do it like I did and install it using *Docker* using the bash command:
 docker run -p 8888:8888 -v /path/on/host:/path/in/container jupyter/base-notebook
 ```
 
-__Importing the various Library__ 
+__IMPORT THE VARIOUS LIBRARY__ 
 
 ```python
 !pip install pandas matplotlib numpy
