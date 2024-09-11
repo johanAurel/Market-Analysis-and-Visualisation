@@ -1,4 +1,6 @@
-## Installing JUPYTER (OPTIONAL)
+## MARKET ANALYSIS AND VISUALISATION
+
+__INSTALLATION JUPYTER (OPTIONAL)__
 
 First I would recommend to install __JUPYTER__ because it looks more appealing than __VSCode__ for __Python__.
 
@@ -14,7 +16,7 @@ Or do it like I did and install it using *Docker* using the bash command:
 docker run -p 8888:8888 -v /path/on/host:/path/in/container jupyter/base-notebook
 ```
 
-## Importing the various Library 
+__Importing the various Library__ 
 
 ```python
 !pip install pandas matplotlib numpy
