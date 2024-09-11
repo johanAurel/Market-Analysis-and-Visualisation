@@ -14,13 +14,13 @@ Or do it like I did and install it using *Docker* using the bash command:
 docker run -p 8888:8888 -v /path/on/host:/path/in/container jupyter/base-notebook
 ```
 
-## Importing the various Dictionaries 
+## Importing the various Library 
 
 ```python
 !pip install pandas matplotlib numpy
 ```
 
-For installing the dictionaries and make it be available for import
+For installing the library and make it be available for import
 
 ```python
 Import pandas as pd
