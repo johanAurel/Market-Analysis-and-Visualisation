@@ -1,6 +1,6 @@
 ## Installing JUPYTER (OPTIONAL)
 
-First I would recommend to install JUPYTER because it looks more appealing than __VSCode__ for __Python__.
+First I would recommend to install __JUPYTER__ because it looks more appealing than __VSCode__ for __Python__.
 
 You can either install it with your __Python__ console using the command:
 
@@ -26,6 +26,7 @@ For installing the library and make it be available for import
 Import pandas as pd
 Import mathplotlib.pyplot as plt
 Import numpy as np
+%matplot inline
 ```
 
 For importing Pandas, Mathplotlib and Numpy respectively.
