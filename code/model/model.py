@@ -32,8 +32,6 @@ def support_and_resistance(df):
     df['Resistance'] = df['High'].rolling(20).max()
     return df
 
-import matplotlib.pyplot as plt
-
 def plot_data(df):
     plt.figure(figsize=(12, 6))
     
