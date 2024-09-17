@@ -1,56 +1,45 @@
+import requests
 import pandas as pd
-# import numpy as np
-# import matplotlib.pyplot as plt
-# import requests as req
-# from dotenv import load_dotenv
-# import os
+from model.variables import URL, API_KEY
 
+# Define parameters for API request
+params = {
+    'function': 'TIME_SERIES_INTRADAY',
+    'symbol': 'EUR/USD',  # Example symbol, replace with actual if needed
+    'interval': '5min',
+    'apikey': API_KEY  # Correct parameter name for API key
+}
 
+def fetch_data():
+    try:
+        # Make the API request
+        response = requests.get(URL, params=params)
+        response.raise_for_status()  # Raise an error for bad responses
 
-# load_dotenv()
+        # Check if the response was successful
+        if response.status_code == 200:
+            data = response.json()  # Parse JSON response
+            key = f'Time Series ({params["interval"]})'  # Dynamic key based on interval
 
-# api_key = os.getenv('API_KEY')
-# url = os.getenv('URL')
+            # Debugging: print out the raw response to check data structure
+            print("Raw data from API:", data)
 
+            # Check if the key exists in the response
+            if key in data:
+                df = pd.DataFrame(data[key]).T  # Transpose to get time as index
+                df.index = pd.to_datetime(df.index)  # Convert index to datetime
+                df = df.astype(float)  # Convert data to float
+                return df
+            else:
+                print(f"Key '{key}' not found in response.")
+                return None
+        else:
+            print(f"Failed to retrieve data. Status code: {response.status_code}")
+            return None
+    except requests.RequestException as e:
+        print(f"An error occurred: {e}")
+        return None
 
-# params = {
-#     'function': 'TIME_SERIES_INTRADAY',
-#     'symbol': input("write symbol name"),   # Example symbol
-#     'interval': input('Enter the interval (e.g., 5min):')  # Example interval
-# }
-
-# def choosing_stock(params):
-#     # Print parameters to debug
-#     print(f"Parameters received: {params}")
-    
-#     # Add API key to parameters
-#     params['api_key'] = api_key
-    
-#     # Make API request
-#     response = req.get(url, params=params)
-    
-
-#     if response.status_code == 200:
-#         print('Success')
-#         data = response.json()
-#         # Print data to debug
-#         print('Data received:', data)
-#         # Assuming the API returns 'Time Series (Daily)'
-#         if 'Time Series (Daily)' in data:
-#             return pd.DataFrame(data['Time Series (Daily)']).T
-#         else:
-#             print('Expected data not found in the response.')
-#             return None
-#     else:
-#         print(f'Error: {response.status_code}')
-#         return None
-
-
-# df = choosing_stock(params)
-
-# # Print DataFrame to debug
-# if df is not None:
-#     print(df.head())
-# else:
-#     print("No data returned.")
-print(pd.__version__)
+# Fetch data and create DataFrame
+data_frame = fetch_data()
+print(data_frame)
