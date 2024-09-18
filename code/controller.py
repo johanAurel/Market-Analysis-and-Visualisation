@@ -1,4 +1,5 @@
-import requests
+# import requests
+import json
 import pandas as pd
 from model.variables import URL, API_KEY
 from model.model import indicator, support_and_resistance, plot_data, trading_signal
@@ -20,28 +21,20 @@ params ={
 }
 
 # Make the GET request
-response = requests.get(URL, headers=headers, params=params)
+# response = requests.get(URL, headers=headers, params=params)
 
-# Check the status of the response
-if response.status_code == 200:
-    # Parse response as JSON
-    data = response.json()  # Assuming the response is in JSON format
-    
-    # If data contains a nested dictionary or list, adjust accordingly
-    # For example, if 'Time Series' is a key in the response:
-    if 'Time Series' in data:
-        # Extract time series data (assuming it is under the key 'Time Series')
-        time_series_data = data['Time Series']
+# # Check the status of the response
+# if response.status_code == 200:
+#     # Parse response as JSON
+#     data = response.json()  # Assuming the response is in JSON format
+#     df= pd.DataFrame(data)
+#     columns_names = df.columns
+#     print(df.head())
 
-        # Convert time series data to DataFrame
-        df = pd.DataFrame.from_dict(time_series_data, orient='index')
 
-        # Display the first few rows
-        print(df.head())
+# else:
+#     print(f"Error: {response.status_code}")
 
-        # Print the columns of the DataFrame
-        print(df.columns.tolist())
-    else:
-        print("Unexpected data structure:", data)
-else:
-    print(f"Error: {response.status_code}")
+Dict = { "A":[1], "B":[2], "C": [3]}
+df = pd.DataFrame(Dict)
+print(df.head(2))
