@@ -3,7 +3,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 import requests
 
+
+# Extract and transform the data
+
+
 def indicator(df):
+    df['Date'] = pd.to_datetime(df['time'])
+    df['Open'] = df['mid'].apply(lambda x: float(x['o']))
+    df['High'] = df['mid'].apply(lambda x: float(x['h']))
+    df['Low'] = df['mid'].apply(lambda x: float(x['l']))
+    df['Close'] = df['mid'].apply(lambda x: float(x['c']))
+    df['Volume'] = df['volume']
+    df['Price'] = df['Close']  # Assuming 'Price' is equivalent to 'Close' for VWAP
+    # Drop unnecessary columns
+    df = df[['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Price']]
     # Ensure 'Close', 'Price', and 'Volume' columns are present
     if 'Close' not in df.columns or 'Price' not in df.columns or 'Volume' not in df.columns:
         raise ValueError("DataFrame must contain 'Close', 'Price', and 'Volume' columns")
@@ -29,18 +42,36 @@ def indicator(df):
     return df
 
 def support_and_resistance(df):
+    df['Date'] = pd.to_datetime(df['time'])
+    df['Open'] = df['mid'].apply(lambda x: float(x['o']))
+    df['High'] = df['mid'].apply(lambda x: float(x['h']))
+    df['Low'] = df['mid'].apply(lambda x: float(x['l']))
+    df['Close'] = df['mid'].apply(lambda x: float(x['c']))
+    df['Volume'] = df['volume']
+    df['Price'] = df['Close']  # Assuming 'Price' is equivalent to 'Close' for VWAP
+    # Drop unnecessary columns
+    df = df[['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Price']]
     # Ensure 'High' and 'Low' columns are present
     if 'High' not in df.columns or 'Low' not in df.columns:
         raise ValueError("DataFrame must contain 'High' and 'Low' columns")
 
     # Calculate support and resistance
-    df['Support'] = df['Low'].rolling(20).min()
-    df['Resistance'] = df['High'].rolling(20).max()
+    df['Support'] = df['Low'].rolling(window=20).min()
+    df['Resistance'] = df['High'].rolling(window=20).max()
     
     return df
 
 def plot_data(df):
-    plt.figure(figsize=(12, 6))
+    df['Date'] = pd.to_datetime(df['time'])
+    df['Open'] = df['mid'].apply(lambda x: float(x['o']))
+    df['High'] = df['mid'].apply(lambda x: float(x['h']))
+    df['Low'] = df['mid'].apply(lambda x: float(x['l']))
+    df['Close'] = df['mid'].apply(lambda x: float(x['c']))
+    df['Volume'] = df['volume']
+    df['Price'] = df['Close']  # Assuming 'Price' is equivalent to 'Close' for VWAP
+    # Drop unnecessary columns
+    df = df[['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Price']]
+    plt.figure(figsize=(12, 8))
     
     # Plot Closing Price and Moving Averages
     plt.subplot(2, 1, 1)
@@ -65,6 +96,15 @@ def plot_data(df):
     plt.show()
 
 def trading_signal(df, amount_to_trade):
+    df['Date'] = pd.to_datetime(df['time'])
+    df['Open'] = df['mid'].apply(lambda x: float(x['o']))
+    df['High'] = df['mid'].apply(lambda x: float(x['h']))
+    df['Low'] = df['mid'].apply(lambda x: float(x['l']))
+    df['Close'] = df['mid'].apply(lambda x: float(x['c']))
+    df['Volume'] = df['volume']
+    df['Price'] = df['Close']  # Assuming 'Price' is equivalent to 'Close' for VWAP
+    # Drop unnecessary columns
+    df = df[['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Price']]
     
     # Ensure the necessary columns are present
     required_columns = ['Close', 'MA5', 'MA9', 'MA50', 'VWAP', 'Support', 'Resistance', 'RSI']
@@ -100,4 +140,12 @@ def trading_signal(df, amount_to_trade):
     else:
         return "Hold"
 
+# Apply the functions
+df = indicator(df)
+df = support_and_resistance(df)
+plot_data(df)
 
+# Example amount to trade
+amount_to_trade = 10
+signal = trading_signal(df, amount_to_trade)
+print(signal)

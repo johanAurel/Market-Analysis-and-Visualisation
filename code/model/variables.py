@@ -1,4 +1,7 @@
 from model.hidden import API_KEY,USER_ID
+# USER_ID Constant (replace with your actual user ID)
+
+
 # Initialize all inputs to None
 instrument = None
 order = None
@@ -46,81 +49,100 @@ def get_trade():
 # GET REQUESTS
 
 # Accounts
-LIST_OF_ACCOUNTS = 'https://api-fxpractice.oanda.com/v3/accounts'
-FULL_DETAILS_OF_CHOSEN_ACCOUNT= f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}'
-SUMMARY_OF_CHOSEN_ACCOUNT= f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/summary'
+LIST_OF_ACCOUNTS = f'https://api-fxpractice.oanda.com/v3/accounts'
+FULL_DETAILS_OF_CHOSEN_ACCOUNT = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}'
+SUMMARY_OF_CHOSEN_ACCOUNT = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/summary'
 
 # Instruments
 INSTRUMENTS_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/instruments'
-CANDLES_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/instruments/{get_instrument()}/candles'
+def get_candles_url():
+    return f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/instruments/{get_instrument()}/candles'
 
 # Orders
-ORDER_URL= f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/orders'
-ORDER_SPECIFIER_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/orders/{get_order()}'
+ORDER_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/orders'
+def get_order_specifier_url():
+    return f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/orders/{get_order()}'
 PENDING_ORDER_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/pendingOrders'
 
 # Trades
 LIST_OF_TRADES_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/trades'
 OPEN_TRADES_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/openTrades'
-GET_SPECIFIC_TRADES_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/trades/{get_trade()}'
+def get_specific_trades_url():
+    return f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/trades/{get_trade()}'
 
 # Positions
 LIST_OF_POSITIONS_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/positions'
-POSITIONS_FOR_SINGLE_INSTRUMENTS_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/positions/{get_position()}'
+def get_positions_for_single_instrument_url():
+    return f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/positions/{get_position()}'
 OPEN_POSITIONS_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/openPositions'
 
 # Transactions
 LIST_OF_ALL_TRANSACTION_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/transactions'
-SINGLE_TRANSACTION_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/transactions/{get_transaction()}'
+def get_single_transaction_url():
+    return f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/transactions/{get_transaction()}'
+
 
 ## POST REQUESTS ##
 
 # Orders
 CREATE_ORDER_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/orders'
-create_order_header = {
-    "Authorization": "Bearer YOUR_API_KEY",  # Replace with your actual API key
-    "Accept-Datetime-format": "RFC3339"
-}
-body = {
-    # Fill this in with your order parameters as needed
+post_examples ={
+  "order": {
+    "price": "1.5000",
+    "stopLossOnFill": {
+      "timeInForce": "GTC",
+      "price": "1.7000"
+    },
+    "takeProfitOnFill": {
+      "price": "1.14530"
+    },
+    "timeInForce": "GTC",
+    "instrument": "USD_CAD",
+    "units": "-1000",
+    "type": "LIMIT",
+    "positionFill": "DEFAULT"
+  }
 }
 
-# PUT REQUESTS
+
+## PUT REQUESTS ##
 
 # Cancel an order
-ORDER_CANCEL_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/orders/{get_order()}/cancel'
+def get_order_cancel_url():
+    return f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/orders/{get_order()}/cancel'
 
 # Close a trade
-TRADE_CLOSE_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/trades/{get_trade()}/close'
+def get_trade_close_url():
+    return f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/trades/{get_trade()}/close'
 
 ## Libraries to send
 
 ACCOUNTS = {
     "GET": {
         'LIST_OF_ACCOUNTS': LIST_OF_ACCOUNTS, 
-        'FULL_DETAILS_OF_CHOSEN_ACCOUNT' : FULL_DETAILS_OF_CHOSEN_ACCOUNT,
-        'SUMMARY_OF_CHOSEN_ACCOUNT' : SUMMARY_OF_CHOSEN_ACCOUNT
+        'FULL_DETAILS_OF_CHOSEN_ACCOUNT': FULL_DETAILS_OF_CHOSEN_ACCOUNT,
+        'SUMMARY_OF_CHOSEN_ACCOUNT': SUMMARY_OF_CHOSEN_ACCOUNT
     }
 }
 
 INSTRUMENTS = {
     "GET": {
         'INSTRUMENTS_URL': INSTRUMENTS_URL, 
-        'CANDLES_URL': CANDLES_URL
+        'CANDLES_URL': get_candles_url
     }
 }
 
 ORDERS = {
     "GET": {
         'ORDER_URL': ORDER_URL, 
-        'ORDER_SPECIFIER_URL': ORDER_SPECIFIER_URL, 
+        'ORDER_SPECIFIER_URL': get_order_specifier_url, 
         'PENDING_ORDER_URL': PENDING_ORDER_URL
     },
     "POST": {
         'CREATE_ORDER_URL': CREATE_ORDER_URL
     },
     "PUT": {
-        'ORDER_CANCEL_URL': ORDER_CANCEL_URL
+        'ORDER_CANCEL_URL': get_order_cancel_url
     }
 }
 
@@ -130,14 +152,14 @@ TRADES = {
         'OPEN_TRADES_URL': OPEN_TRADES_URL
     },
     "PUT": {
-        'TRADE_CLOSE_URL': TRADE_CLOSE_URL
+        'TRADE_CLOSE_URL': get_trade_close_url
     }
 }
 
 POSITIONS = {
     "GET": {
         'LIST_OF_POSITIONS_URL': LIST_OF_POSITIONS_URL, 
-        'POSITIONS_FOR_SINGLE_INSTRUMENTS_URL': POSITIONS_FOR_SINGLE_INSTRUMENTS_URL, 
+        'POSITIONS_FOR_SINGLE_INSTRUMENTS_URL': get_positions_for_single_instrument_url, 
         'OPEN_POSITIONS_URL': OPEN_POSITIONS_URL
     }
 }
@@ -145,6 +167,6 @@ POSITIONS = {
 TRANSACTIONS = {
     "GET": {
         'LIST_OF_ALL_TRANSACTION_URL': LIST_OF_ALL_TRANSACTION_URL, 
-        'SINGLE_TRANSACTION_URL': SINGLE_TRANSACTION_URL
+        'SINGLE_TRANSACTION_URL': get_single_transaction_url
     }
 }
