@@ -11,7 +11,7 @@ trade = None
 
 # Function to get instrument input
 def get_instrument():
-    global instrument
+    
     if instrument is None:
         instrument = input("Enter the instrument (e.g., 'USD_CAD'): ")
     return instrument
@@ -55,8 +55,11 @@ SUMMARY_OF_CHOSEN_ACCOUNT = f'https://api-fxpractice.oanda.com/v3/accounts/{USER
 
 # Instruments
 INSTRUMENTS_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/instruments'
-def get_candles_url():
-    return f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/instruments/{get_instrument()}/candles'
+def get_candles_url(instrument=None):
+    if instrument is None:
+        instrument = get_instrument()  # Fallback to get_instrument if no instrument is provided
+    return f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/instruments/{instrument}/candles'
+
 
 # Orders
 ORDER_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/orders'
