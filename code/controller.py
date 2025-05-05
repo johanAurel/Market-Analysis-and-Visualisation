@@ -18,9 +18,7 @@ params={
     "granularity": 'M15',
     "alignmentTimezone": "America/New_York",
     "includeFirst": False,
-    "from": "2021-01-01T00:00:00Z",
-    
-    
+    "from": "2021-01-01T00:00:00Z"  
 }
 
 def plot_chart(instrument=None):

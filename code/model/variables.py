@@ -55,13 +55,28 @@ SUMMARY_OF_CHOSEN_ACCOUNT = f'https://api-fxpractice.oanda.com/v3/accounts/{USER
 
 # Instruments
 INSTRUMENTS_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/instruments'
+
+
+def get_candles_url(instrument=None):
+    INSTRUMENTS_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/instruments'
+
+
 def get_candles_url(instrument=None):
     if instrument is None:
         instrument = get_instrument()  # Fallback to get_instrument if no instrument is provided
+    INSTRUMENTS_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/instruments'
+
+def get_candles_url(instrument=None):
     return f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/instruments/{instrument}/candles'
 
 
+def set_user_id(user_id=None):
+    if user_id is None:
+        user_id = USER_ID
+
+
 # Orders
+
 ORDER_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/orders'
 def get_order_specifier_url():
     return f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/orders/{get_order()}'
