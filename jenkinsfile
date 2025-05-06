@@ -11,7 +11,7 @@ pipeline{
     stages('Build Docker image'){
         steps{
             echo "Building Market-Analysis-and-Visualisation Docker image"
-            sh "docker build -t $PYTHON_IMAGE ."
+            sh "docker build -t $PYTHON_IMAGE ./code"
         }
     }
     stages('Run Python container'){
