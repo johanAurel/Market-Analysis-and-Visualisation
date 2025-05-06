@@ -3,7 +3,7 @@ pipeline{
 
     environment{
        
-        PYTHON_IMAGE = "Market-Analysis-and-Visualisation"
+        PYTHON_IMAGE = "market-analysis-and-visualisation"
         PYTHON_CONTAINER = "m_a_v"
         APP_PORT = "8000"
 
