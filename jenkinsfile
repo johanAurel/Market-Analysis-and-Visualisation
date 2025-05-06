@@ -8,20 +8,23 @@ pipeline{
         APP_PORT = "8000"
 
     }
-    stages('Build Docker image'){
-        steps{
-            echo "Building Market-Analysis-and-Visualisation Docker image"
-            sh "docker build -t $PYTHON_IMAGE ./code"
-        }
-    }
-    stages('Run Python container'){
-        steps{
-            echo "Running Python container"
-            sh '''
-            docker rm -f $PYTHON_CONTAINER || true
-            docker run -d --name $PYTHON_CONTAINER -p $APP_PORT:$APP_PORT $PYTHON_IMAGE
-            '''
-        }
+    stages{      
+        stage('Build Docker image'){
+            steps{
+                echo "Building Market-Analysis-and-Visualisation Docker image"
+                sh "docker build -t $PYTHON_IMAGE ./code"
+            }
+           }
+          
+        stage('Run Python container'){      
+            steps{
+                echo "Running Python container"
+                sh '''
+                docker rm -f $PYTHON_CONTAINER || true
+                docker run -d --name $PYTHON_CONTAINER -p $APP_PORT:$APP_PORT $PYTHON_IMAGE
+                '''
+                }
+           }
     }
     
 }
