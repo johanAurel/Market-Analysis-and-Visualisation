@@ -1,11 +1,5 @@
 pipeline{
-    agent {
-        docker {
-             image 'jenkins-docker-agent'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    
-    }
+    agent any
 
     environment{
        
@@ -14,11 +8,22 @@ pipeline{
         APP_PORT = "8000"
 
     }
-    stages{      
+    stages{
+        stage('Install Docker CLI'){
+            steps{
+                 sh ''' 
+                  apk update
+                  apk add --no-cache docker
+                  docker --version
+                  '''}
+                 }      
         stage('Build Docker image'){
             steps{
                 echo "Building Market-Analysis-and-Visualisation Docker image"
-                sh "docker build -t $PYTHON_IMAGE ./code"
+                sh '''
+                      docker rmi $PYTHON_IMAGE
+                      docker build -t $PYTHON_IMAGE ./code
+                 '''
             }
            }
           
