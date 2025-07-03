@@ -92,7 +92,11 @@ def get_specific_trades_url():
 LIST_OF_POSITIONS_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/positions'
 def get_positions_for_single_instrument_url():
     return f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/positions/{get_position()}'
+
 OPEN_POSITIONS_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/openPositions'
+
+def delete_all_positions(instrument=None):
+    return f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/positions/{instrument}/close'
 
 # Transactions
 LIST_OF_ALL_TRANSACTION_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/transactions'
@@ -179,7 +183,8 @@ POSITIONS = {
         'LIST_OF_POSITIONS_URL': LIST_OF_POSITIONS_URL, 
         'POSITIONS_FOR_SINGLE_INSTRUMENTS_URL': get_positions_for_single_instrument_url, 
         'OPEN_POSITIONS_URL': OPEN_POSITIONS_URL
-    }
+    },
+    "PUT" : delete_all_positions
 }
 
 TRANSACTIONS = {

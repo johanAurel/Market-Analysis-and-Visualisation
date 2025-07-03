@@ -4,7 +4,7 @@ import pandas as pd
 import questionary
 from model.variables import ACCOUNTS,INSTRUMENTS,ORDERS,TRADES,POSITIONS
 from model.hidden import API_KEY, set_user_id
-from model.model import create_dataframe,indicator, support_and_resistance, plot_combined_data,trading_signal
+from model.model import create_dataframe,run_strategies
 
 # Set up your API key and headers
 headers = {
@@ -15,45 +15,37 @@ headers = {
 
 params={
     "count": 250,
-    "granularity": 'M15',
+    "granularity": questionary.select('Timeframe : ', choices=['S5','S10','S15','S30','M1','M5','M10','M15','M30','H1','H4','D','W','M']).ask(),
     "alignmentTimezone": "America/New_York",
     "includeFirst": False,
     "from": "2021-01-01T00:00:00Z"  
 }
 
-def plot_chart(instrument=None):
-
-    response_2 = requests.get(INSTRUMENTS['GET']['CANDLES_URL'](instrument), headers=headers, params=params)
-  
-    if response_2.status_code == 200:
-  
-        data_2 = response_2.json()  # Assuming the response is in JSON format
-        df_2 = pd.DataFrame(data_2)
-        print('Welcome on your server')
-        candle_sticks = df_2.iloc[:, 2]
-        create_dataframe(candle_sticks)  # Call your dataframe creation function
-        indicator()  # Call your indicator function
-        support_and_resistance()  # Call your support and resistance function
-        plot_combined_data()
-    else:
-      print(f"Failed to fetch data for {instrument}: {response_2.status_code}")
-
 def trade_one(instrument=None):
-   response_2 = requests.get(INSTRUMENTS['GET']['CANDLES_URL'](instrument), headers=headers, params=params)
+    trade_amount = float(input('Enter trade amount: '))
+    print(f"Started monitoring {instrument} for signals... Press Ctrl+C to stop.")
 
-   if response_2.status_code == 200:
-       data_2 = response_2.json()  # Assuming the response is in JSON format
-       df_2 = pd.DataFrame(data_2)
-       print('Welcome on your server')
-       candle_sticks = df_2.iloc[:, 2]
-       create_dataframe(candle_sticks)  # Call your dataframe creation function
-       indicator()  # Call your indicator function
-       support_and_resistance()  # Call your support and resistance function
-       trade_amount = float(input('Enter trade amount: '))
-       trading_signal(trade_amount, instrument, ORDERS['POST']['CREATE_ORDER_URL'], headers=headers)
-   else:
-      print(f"Failed to fetch data for {instrument}: {response_2.status_code}")
-      trade_one()
+    while True:
+        response_2 = requests.get(INSTRUMENTS['GET']['CANDLES_URL'](instrument), headers=headers, params=params)
+
+        if response_2.status_code == 200:
+            data_2 = response_2.json()
+            df_2 = pd.DataFrame(data_2)
+            candle_sticks = data_2.get("candles", [])
+            print(f"Fetched {len(candle_sticks)} candles for {instrument}")
+
+            if not candle_sticks:
+                print(f"No candles found for {instrument}")
+                return
+
+            create_dataframe(candle_sticks)
+            run_strategies(trade_amount, instrument, ORDERS['POST']['CREATE_ORDER_URL'], headers=headers)
+
+        else:
+            print(f"Failed to fetch data for {instrument}: {response_2.status_code}")
+        
+        time.sleep(60)  # wait one candle (adjust based on your granularity)
+
 
    
 # Check the status of the response_1
@@ -70,15 +62,28 @@ def action():
       for instrument in list_of_instrument:
          instrument_names.append(instrument['name'])
       
-      choice_1 = questionary.select('What do you want to do?', choices =['Plot','Trade','Account','End']).ask()  
+      choice_1 = questionary.select('What do you want to do?', choices =['See','Trade','Account','Exit']).ask()  
       #choosing between Plot and Trade
-      #PLOT
-      if choice_1.lower() == 'plot':
-          instrument_name = questionary.select('What do you want to plot?', choices = instrument_names).ask()
-          plot_chart(instrument=instrument_name)
+      #SEE
+      if choice_1 == 'See':
+          sight = questionary.select('What do you want to see?', choices =['Orders','Positions','Trades','Back']).ask()
+          if sight == 'Orders':
+              res = requests.get(ORDERS['GET']['ORDER_URL'],headers=headers, params=params)
+              orders = res.json()
+              print(orders)
+          elif sight == 'Positions':
+              pos = requests.get(POSITIONS['GET']['LIST_OF_POSITIONS_URL'], headers=headers, params=params)
+              positions = pos.json()
+              print(positions)
+          elif sight == 'Trades':
+              tr = requests.get(TRADES['GET']['LIST_OF_TRADES_URL'],headers=headers,params=params)
+              trades = tr.json()
+              print(trade for trade in trades['trades'])
+          else:
+              action()
       #TRADE
-      elif choice_1.lower() == 'trade':
-          choice_2 = questionary.select('How do you want to do trade?', choices =['Single-trade','Auto-trade']).ask()
+      elif choice_1 == 'Trade':
+          choice_2 = questionary.select('How do you want to do trade?', choices =['Single-trade','Auto-trade','Close-All-Positions','Back']).ask()
          
           if choice_2.lower() == 'single-trade':
              instrument_name = questionary.select('What do you want to trade?', choices = instrument_names).ask()
@@ -86,31 +91,48 @@ def action():
 
           elif choice_2.lower() == 'auto-trade':
              amount = input('choose a lot size for all trade:')
-             while True:            
-              for instrument in list_of_instrument:
-                    element = instrument['name']
-                               
-                    response_2 = requests.get(INSTRUMENTS['GET']['CANDLES_URL'](element), headers=headers, params=params)
-                    time.sleep(1)
+             print("Auto-trading all instruments. Monitoring for signals... Press Ctrl+C to stop.")
+             while True:
+                 for instrument in list_of_instrument:
+                     element = instrument['name']
+                     response_2 = requests.get(INSTRUMENTS['GET']['CANDLES_URL'](element), headers=headers, params=params)
+                     time.sleep(1)
+                     if response_2.status_code == 200:
+                         data_2 = response_2.json()
+                         df_2 = pd.DataFrame(data_2)
+                         candle_sticks = data_2.get("candles", [])
+                         #print(f"Fetched {len(candle_sticks)} candles for {instrument}")
+                         if not candle_sticks:
+                             print(f"No candles found for {instrument}")
+                             return
 
-                    if response_2.status_code == 200: 
-                               
-                     data_2 = response_2.json()  # Assuming the response is in JSON format
-                     df_2 = pd.DataFrame(data_2)
-                     candle_sticks = df_2.iloc[:, 2]
-                     create_dataframe(candle_sticks)  # Call your dataframe creation function
-                     indicator()  # Call your indicator function
-                     support_and_resistance()  # Call your support and resistance function
-                     trading_signal(amount, element, ORDERS['POST']['CREATE_ORDER_URL'], headers=headers) # Call
-                     count += 1
-                     print(f'cycle count:{count}')
-                    else:
-                     print(f"Failed to fetch data for {instrument}: {response_2.status_code}")
-          else: 
-             action()        
+          elif choice_2.lower() == 'close-all-positions':
+              print('Closing all positions...')
+              while True:
+                  for instrument in list_of_instrument:
+                      element = instrument['name']
+                      body = {"longUnits": "ALL", "shortUnits": "ALL" }
+                      try:
+                          response_2 = requests.put(
+                              POSITIONS['PUT'](element),
+                              headers=headers,
+                              json=body  # ← important!
+                              )
+                          if response_2.status_code == 200:
+                                  print(f"✅ Successfully closed position for {element}")
+                          else:
+                                  print(f"❌ Failed to close position for {element}: {response_2.status_code}")
+                                  print(response_2.text)
+
+                      except Exception as e:
+                                      print(f"⚠️ Error while closing position for {element}: {str(e)}")
+                  break
+
+          
+              
       #ACCOUNT
-      elif choice_1.lower() == 'account':
-        choices_3 = questionary.select('what interests you with your account today?',choices=['My details', 'List of Accounts']).ask()
+      elif choice_1 == 'Account':
+        choices_3 = questionary.select('what interests you with your account today?',choices=['My details', 'List of Accounts','Back']).ask()
         if choices_3 == 'My details':
            options = questionary.select('', choices=['Summary', 'Full Details']).ask()
            if options == 'Summary':
@@ -125,7 +147,7 @@ def action():
               print(data_2)
               time.sleep(10)
               action()
-        else:
+        elif choices_3 == 'List of Accounts':
           response_2 = requests.get(ACCOUNTS['GET']['LIST_OF_ACCOUNTS'],headers=headers)
           data_2 = response_2.json()
           list_of_accounts = data_2['accounts']
@@ -134,6 +156,8 @@ def action():
           set_user_id(new_user_id)
           time.sleep(2)
           action()
+        else:
+            action()
       #STOP
       else:
           print('Thank you, see you later!!!')
@@ -143,5 +167,13 @@ def action():
         
         print(f"Failed to fetch data for {instrument}: {response_2.status_code}")     
 
-action()
+
+
+if __name__ == "__main__":
+    try:
+        print('Autotrading running')
+        while True:
+            action()
+    except KeyboardInterrupt:
+        print("\n📉 Shutting down analysis.")
 
