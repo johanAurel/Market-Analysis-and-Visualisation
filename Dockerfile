@@ -1,19 +1,15 @@
-FROM python:3.13-alpine
+FROM python:3.12-slim
 
 # Set working directory
 WORKDIR /app
 
 # Install build dependencies
-RUN apk add --no-cache \
-    gcc \
-    g++ \
-    make \
+RUN apt-get update && apt-get install -y \
+    build-essential \
     libffi-dev \
-    musl-dev \
-    build-base \
-    py3-pip \
     python3-dev \
-    openssl-dev
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy and install dependencies
 COPY /code/requirements.txt .
@@ -25,4 +21,3 @@ COPY /code /app/
 
 # Run the app
 CMD [ "python3", "controller.py" ]
-

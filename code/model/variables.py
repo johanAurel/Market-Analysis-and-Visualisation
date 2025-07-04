@@ -1,4 +1,4 @@
-from model.hidden import API_KEY,USER_ID
+from model.hidden import USER_ID
 # USER_ID Constant (replace with your actual user ID)
 
 
@@ -11,10 +11,13 @@ trade = None
 
 # Function to get instrument input
 def get_instrument():
-    
+    global instrument
     if instrument is None:
         instrument = input("Enter the instrument (e.g., 'USD_CAD'): ")
     return instrument
+
+def get_candles_url(instrument):
+    return f'https://api-fxpractice.oanda.com/v3/instruments/{instrument}/candles'
 
 # Function to get order input
 def get_order():
@@ -53,18 +56,6 @@ LIST_OF_ACCOUNTS = f'https://api-fxpractice.oanda.com/v3/accounts'
 FULL_DETAILS_OF_CHOSEN_ACCOUNT = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}'
 SUMMARY_OF_CHOSEN_ACCOUNT = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/summary'
 
-# Instruments
-INSTRUMENTS_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/instruments'
-
-
-def get_candles_url(instrument=None):
-    INSTRUMENTS_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/instruments'
-
-
-def get_candles_url(instrument=None):
-    if instrument is None:
-        instrument = get_instrument()  # Fallback to get_instrument if no instrument is provided
-    INSTRUMENTS_URL = f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/instruments'
 
 def get_candles_url(instrument=None):
     return f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/instruments/{instrument}/candles'
@@ -138,19 +129,14 @@ def get_trade_close_url():
     return f'https://api-fxpractice.oanda.com/v3/accounts/{USER_ID}/trades/{get_trade()}/close'
 
 ## Libraries to send
-
+INSTRUMENTS = {
+    'GET':{ 'CANDLES': get_candles_url}
+    }
 ACCOUNTS = {
     "GET": {
         'LIST_OF_ACCOUNTS': LIST_OF_ACCOUNTS, 
         'FULL_DETAILS_OF_CHOSEN_ACCOUNT': FULL_DETAILS_OF_CHOSEN_ACCOUNT,
         'SUMMARY_OF_CHOSEN_ACCOUNT': SUMMARY_OF_CHOSEN_ACCOUNT
-    }
-}
-
-INSTRUMENTS = {
-    "GET": {
-        'INSTRUMENTS_URL': INSTRUMENTS_URL, 
-        'CANDLES_URL': get_candles_url
     }
 }
 
