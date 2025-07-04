@@ -1,3 +1,7 @@
 .env.local
-*__pycache__
-*venv
+__pycache__/
+venv/
+algo-key
+terraform/*.terraform
+terraform/*.terraform.tfstate
+

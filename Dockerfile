@@ -1,23 +1,15 @@
-FROM python:3.12-slim
+FROM python:3.13-slim
 
-# Set working directory
-WORKDIR /app
-
-# Install build dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libffi-dev \
-    python3-dev \
-    libssl-dev \
-    && rm -rf /var/lib/apt/lists/*
+    libblas-dev \
+    liblapack-dev \
+    libfreetype6-dev \
+    libpng-dev \
+    pkg-config \
+    && pip install --upgrade pip
 
-# Copy and install dependencies
-COPY /code/requirements.txt .
-RUN pip install --upgrade pip
+COPY requirements.txt .
+
 RUN pip install -r requirements.txt
-
-# Copy application code
-COPY /code /app/
-
-# Run the app
-CMD [ "python3", "controller.py" ]
