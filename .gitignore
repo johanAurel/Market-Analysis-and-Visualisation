@@ -5,3 +5,4 @@ algo-key
 terraform/*.terraform
 terraform/*.terraform.tfstate
 
+.terraform/
