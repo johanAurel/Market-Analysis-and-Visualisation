@@ -1,15 +1,27 @@
-FROM python:3.13-slim
+FROM python:2.7-alpine
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
+# Install build dependencies
+RUN apk add --no-cache --virtual .build-deps \
+    gcc \
+    musl-dev \
+    gfortran \
     libffi-dev \
-    libblas-dev \
-    liblapack-dev \
-    libfreetype6-dev \
+    freetype-dev \
     libpng-dev \
-    pkg-config \
-    && pip install --upgrade pip
+    pkgconfig \
+    openblas-dev \
+    && pip install --upgrade pip setuptools wheel
 
+# Copy requirements.txt
 COPY requirements.txt .
 
-RUN pip install -r requirements.txt
+# Install compatible older versions of packages for Python 2
+RUN pip install \
+    "pandas<1.0" \
+    "numpy<1.17" \
+    matplotlib==2.2.5 \
+    questionary==1.10.0 \
+    requests
+
+# Remove build dependencies to keep image small
+RUN apk del .build-deps
