@@ -27,7 +27,7 @@ def trade(units, ticker, headers):
     body = {
         "order": {
             "units": str(units),
-            "ticker": ticker,
+            "instrument": ticker,
             "timeInForce": "GTC",
             "type": "MARKET",
             "positionFill": "DEFAULT"
