@@ -11,7 +11,6 @@ variable "key_name" {
   default = "algo-key"
 }
 
-variable "instance_name" {
-  type = string
-  default = "algo-trading"
+variable "instance_names" {
+  type = list(string)
 }

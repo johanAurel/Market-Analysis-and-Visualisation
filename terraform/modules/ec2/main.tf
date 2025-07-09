@@ -3,6 +3,7 @@ data "aws_ssm_parameter" "ami" {
 }
 
 resource "aws_instance" "this" {
+  count = 6
   ami                         = data.aws_ssm_parameter.ami.value
   instance_type               = "t2.nano"  # Free tier instance
   subnet_id                   = var.subnet_id
@@ -11,7 +12,6 @@ resource "aws_instance" "this" {
   associate_public_ip_address = true
 
   tags = {
-    Name = var.instance_name
-    
+    Name = var.instance_names[count.index]
   }
 }
