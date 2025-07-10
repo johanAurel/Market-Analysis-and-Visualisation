@@ -28,7 +28,7 @@ def trade(units, ticker, headers):
         "order": {
             "units": str(units),
             "instrument": ticker,
-            "timeInForce": "GTC",
+            "timeInForce": "FOK",
             "type": "MARKET",
             "positionFill": "DEFAULT"
         }
@@ -121,6 +121,7 @@ def orb_strategy(amount_to_trade, ticker, headers, exportable_df, existing_posit
         return None
 
     if breakout_long:
+        print('ORB LONG')
         t = trade(amount_to_trade, ticker, headers)
         if t:
             return {
@@ -135,6 +136,7 @@ def orb_strategy(amount_to_trade, ticker, headers, exportable_df, existing_posit
             }
 
     elif breakout_short:
+         print('ORB SHORT')
         t = trade('-' + str(amount_to_trade), ticker, headers)
         if t:
             return {
