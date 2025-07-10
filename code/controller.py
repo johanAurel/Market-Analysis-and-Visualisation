@@ -16,7 +16,7 @@ headers = {
 
 params = {
     "count": 250,
-    "granularity": "M15",
+    "granularity": "M5",
     "alignmentTimezone": "America/New_York",
     "includeFirst": False,
     "from": "2025-07-01T00:00:00Z",

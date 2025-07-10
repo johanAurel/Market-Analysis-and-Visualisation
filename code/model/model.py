@@ -19,7 +19,7 @@ def create_dataframe(candlesticks):
         'Volume': [candle['volume'] for candle in candlesticks]
     }
     exportable_df = pd.DataFrame(data)
-    exportable_df['Date'] = pd.to_datetime(exportable_df['Date'])
+    df['Date'] = pd.to_datetime(df['Date']).dt.tz_convert('UTC')  # or your exchange timezone
     exportable_df['Price'] = exportable_df['Close']
     return exportable_df
 
@@ -63,26 +63,37 @@ def orb_strategy(amount_to_trade, ticker, headers, exportable_df, existing_posit
     df['Hour'] = df['Date'].dt.hour
     df['Minute'] = df['Date'].dt.minute
 
+    # Open Range and Trading Time Parameters
     open_range_start_hour = 8
     open_range_start_minute = 30
     open_range_duration_minutes = 15
     trade_end_hour = 16
     trade_end_minute = 0
-    min_breakout_pct = 0.001
+
+    min_breakout_pct = 0.0001  # instead of 0.001
+    pip = 0  # no extra buffer
+
     atr_length = 14
     atr_multiplier = 1.0
-    pip = 0.0001
+    print(f"Open range high * (1 + min_breakout_pct) = {open_range_high * (1 + min_breakout_pct)}")
+    print(f"Open range low * (1 - min_breakout_pct) = {open_range_low * (1 - min_breakout_pct)}")
 
+
+    # Filter data for today
     today = df['Date'].iloc[-1].date()
     df_today = df[df['Date'].dt.date == today]
     if df_today.empty:
         return None
 
+    # Define open range window
     range_start = pd.Timestamp.combine(today, pd.Timestamp(f"{open_range_start_hour}:{open_range_start_minute}").time())
     range_end = range_start + pd.Timedelta(minutes=open_range_duration_minutes)
+
+    # Define trade window
     trade_start = range_end
     trade_end = pd.Timestamp.combine(today, pd.Timestamp(f"{trade_end_hour}:{trade_end_minute}").time())
 
+    # Extract open range data
     range_data = df_today[(df_today['Date'] >= range_start) & (df_today['Date'] < range_end)]
     if range_data.empty:
         return None
@@ -94,35 +105,39 @@ def orb_strategy(amount_to_trade, ticker, headers, exportable_df, existing_posit
     prev = df_today.iloc[-2]
     now = latest['Date']
 
-    in_trade_time = (now >= trade_start) and (now <= trade_end)
-    if not in_trade_time:
+    # Check if current time is within trading window
+    if not (trade_start <= now <= trade_end):
         return None
 
+    # Calculate ATR for volatility-based stop loss
     df['TR'] = np.maximum(df['High'] - df['Low'],
                           np.maximum(abs(df['High'] - df['Close'].shift(1)),
                                      abs(df['Low'] - df['Close'].shift(1))))
     df['ATR'] = df['TR'].rolling(window=atr_length).mean()
+
     atr_value = df['ATR'].iloc[-1]
+    if pd.isna(atr_value):
+        return None  # ATR not available yet
 
-    breakout_long = (
-        (prev['Close'] <= open_range_high * (1 + min_breakout_pct)) and
-        (latest['Close'] > open_range_high * (1 + min_breakout_pct) + pip)
-    )
-    breakout_short = (
-        (prev['Close'] >= open_range_low * (1 - min_breakout_pct)) and
-        (latest['Close'] < open_range_low * (1 - min_breakout_pct) - pip)
-    )
+    # Detect breakout conditions
+    breakout_long = (prev['Close'] <= open_range_high * (1 + min_breakout_pct)) and \
+                    (latest['Close'] > open_range_high * (1 + min_breakout_pct) + pip)
 
-    stop_offset = atr_value * atr_multiplier
+    breakout_short = (prev['Close'] >= open_range_low * (1 - min_breakout_pct)) and \
+                     (latest['Close'] < open_range_low * (1 - min_breakout_pct) - pip)
 
+    # Avoid entering same position again
     if existing_position == 'long' and breakout_long:
         return None
     if existing_position == 'short' and breakout_short:
         return None
 
+    stop_offset = atr_value * atr_multiplier
+
     if breakout_long:
         print('ORB LONG')
         t = trade(amount_to_trade, ticker, headers)
+        print(f"Trade function returned: {t}")
         if t:
             return {
                 'trade_id': t['orderFillTransaction']['tradeOpened']['tradeID'],
@@ -136,8 +151,10 @@ def orb_strategy(amount_to_trade, ticker, headers, exportable_df, existing_posit
             }
 
     elif breakout_short:
-         print('ORB SHORT')
+        print('ORB SHORT')
+        # Assuming the trade function can accept negative amount to short
         t = trade('-' + str(amount_to_trade), ticker, headers)
+        print(f"Trade function returned: {t}")
         if t:
             return {
                 'trade_id': t['orderFillTransaction']['tradeOpened']['tradeID'],
