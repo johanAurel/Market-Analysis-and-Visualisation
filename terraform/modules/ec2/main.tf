@@ -3,7 +3,7 @@ data "aws_ssm_parameter" "ami" {
 }
 
 resource "aws_instance" "this" {
-  count = 6
+  count = 3
   ami                         = data.aws_ssm_parameter.ami.value
   instance_type               = "t2.nano"  # Free tier instance
   subnet_id                   = var.subnet_id

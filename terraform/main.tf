@@ -12,9 +12,6 @@ module "ec2_instance" {
   instance_names = [
      "algo-trading-0",
     "algo-trading-1",
-    "algo-trading-2",
-     "algo-trading-3",
-    "algo-trading-4",
-    "algo-trading-5"
+    "algo-trading-2"
   ]  
 }
