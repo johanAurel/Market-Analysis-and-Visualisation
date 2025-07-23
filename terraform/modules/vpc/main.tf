@@ -41,8 +41,8 @@ resource "aws_security_group" "public_sg" {
   }
   ingress {
     description = "Allow HTTP traffic on port 8000"
-    from_port   = 8000
-    to_port     = 8000
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]  # ⚠️ Open to the world. Change to your IP for security.
   }
